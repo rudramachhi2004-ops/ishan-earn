@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Home - Ishan Earn</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <style>
+    body {
+      background:#111;
+      color:#fff;
+      font-family:Arial;
+      margin:0;
+      padding:20px;
+    }
+    .card {
+      background:#1e1e1e;
+      padding:20px;
+      border-radius:10px;
+      margin-bottom:15px;
+      text-align:center;
+    }
+    button {
+      padding:10px 15px;
+      border:none;
+      border-radius:5px;
+      background:#00c853;
+      font-weight:bold;
+      cursor:pointer;
+    }
+    .logout {
+      background:#ff5252;
+      color:#fff;
+    }
+    input {
+      width:100%;
+      padding:10px;
+      margin-top:10px;
+      border-radius:5px;
+      border:none;
+      text-align:center;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <h2>Welcome</h2>
+    <p id="userEmail">Loading...</p>
+  </div>
+
+  <div class="card">
+    <h3>Your Balance</h3>
+    <h1>₹ <span id="balance">0</span></h1>
+  </div>
+
+  <div class="card">
+    <h3>Your Refer Code</h3>
+    <input type="text" id="referCode" value="RUD004" readonly>
+    <br><br>
+    <button onclick="copyCode()">Copy Code</button>
+  </div>
+
+  <div class="card">
+    <button class="logout" onclick="logout()">Logout</button>
+  </div>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+  <script>
+    var firebaseConfig = {
+      apiKey: "AIzaSyDIcm_i9_1ZwOXtvAiQKZV6EW_QBffR54E",
+      authDomain: "ishan-earn.firebaseapp.com",
+      databaseURL: "https://ishan-earn-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "ishan-earn",
+      storageBucket: "ishan-earn.firebasestorage.app",
+      messagingSenderId: "36226262396",
+      appId: "1:36226262396:web:9cd655342efd0709bf70f9"
+    };
+    firebase.initializeApp(firebaseConfig);
+
+    // Auth check
+    firebase.auth().onAuthStateChanged(function(user) {
+      if (!user) {
+        window.location.href = "index.html";
+      } else {
+        document.getElementById("userEmail").innerText = user.email;
+
+        firebase.database().ref("users/" + user.uid).on("value", function(snapshot){
+          if(snapshot.exists()){
+            document.getElementById("balance").innerText = snapshot.val().balance || 0;
+          }
+        });
+      }
+    });
+
+    function logout(){
+      firebase.auth().signOut().then(()=>{
+        window.location.href = "index.html";
+      });
+    }
+
+    function copyCode(){
+      var copyText = document.getElementById("referCode");
+      copyText.select();
+      copyText.setSelectionRange(0, 99999);
+      document.execCommand("copy");
+      alert("Refer code copied");
+    }
+  </script>
+
+</body>
+</html>
